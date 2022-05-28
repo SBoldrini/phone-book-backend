@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const db = require('../database/connection');
+
 
 class Server {
 
@@ -7,9 +9,32 @@ class Server {
     this.app = express();
     this.port = process.env.PORT;
 
+    this.paths = {
+      auth: '/api/auth',
+      contacts: '/api/contacts'
+    }
+
+    // DB Connection
+    this.dbConnection();
+
     //  Middlewares
     this.middlewares();
 
+    // Routes
+    this.routes();
+
+  }
+
+  // TODO: DB Connection 
+  async dbConnection () {
+    try {
+      await db.authenticate();
+      console.log('Database online');
+
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
   }
 
   middlewares() {
@@ -21,6 +46,11 @@ class Server {
 
     //  Public directory
     this.app.use(express.static('public'));
+  }
+
+  routes() {
+    this.app.use(this.paths.auth, require('../routers/auth'));
+    this.app.use(this.paths.contacts, require('../routers/contacts'));
   }
 
 
