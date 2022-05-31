@@ -8,11 +8,15 @@ const newContact = async(req, res = response) => {
   try {
     const contact = await Contact.create({firstName, lastName, phone});
 
-    res.status(202).json(contact);
+    res.status(202).json({
+      ok: true,
+      contact
+    });
 
   } catch (error) {
     console.log(error);
     res.status(500).json({
+      ok: false,
       msg: 'Please talk to the admin.'
     });
   }
@@ -41,6 +45,7 @@ const getContacts = async(req, res = response) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({
+      ok: false,
       msg: 'Please talk to the admin.'
     });
   }
@@ -55,9 +60,13 @@ const getContact = async(req, res = response) => {
     const contact = await Contact.findByPk(id);
   
     if (contact) {
-      res.status(200).json({contact});
+      res.status(200).json({
+        ok: true,
+        contact
+      });
     } else {
       res.status(404).json({
+        ok: false,
         msg: `There isn't contact with the id: ${id}`
       });
     }
@@ -65,6 +74,7 @@ const getContact = async(req, res = response) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({
+      ok: false,
       msg: 'Please talk to the admin.'
     });
   }
@@ -81,7 +91,8 @@ const updateContact = async(req, res = response) => {
     const contact = await Contact.findByPk(id);
 
     if (!contact) {
-      res.status(404).json({
+      return res.status(404).json({
+        ok: false,
         msg: `There isn't contact with the id: ${id}`
       });
     }
@@ -89,9 +100,13 @@ const updateContact = async(req, res = response) => {
     await contact.update({...data});
   
     if (contact) {
-      res.status(200).json(contact);
+      res.status(200).json({
+        ok: true,
+        contact
+      });
     } else {
       res.status(404).json({
+        ok: false,
         msg: `There isn't contact with the id: ${id}`
       });
     }
@@ -99,6 +114,7 @@ const updateContact = async(req, res = response) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({
+      ok: false,
       msg: 'Please talk to the admin.'
     });
   }
@@ -112,7 +128,8 @@ const deleteContact = async(req, res = response) => {
 
     const contact = await Contact.findByPk(id);
     if (!contact) {
-      res.status(404).json({
+      return res.status(404).json({
+        ok: false,
         msg: `There isn't contact with the id: ${id}`
       });
     }
@@ -120,11 +137,15 @@ const deleteContact = async(req, res = response) => {
     const deleteContact = contact;
 
     await contact.destroy();
-    res.status(200).json(deleteContact);
+    res.status(200).json({
+      ok: true,
+      deleteContact
+    });
 
   } catch (error) {
     console.log(error);
     res.status(500).json({
+      ok: false,
       msg: 'Please talk to the admin.'
     });
   }

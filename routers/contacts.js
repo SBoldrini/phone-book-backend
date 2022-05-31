@@ -13,7 +13,6 @@ const router = Router();
 router.post('/', [
   check('firstName', 'First name is required.').not().isEmpty(),
   check('lastName', 'Last name is required.').not().isEmpty(),
-  check('email', 'Email is required.').normalizeEmail().isEmail(),
   check('phone', 'Phone is required.').not().isEmpty(),
   check('phone', 'Must be a valid phone number like (ej. 098123456 o 29563276).')
     .matches(/^(0?)([2-9]{1})([1-9]{1})([-.]?)([0-9]{3})([-.]?)([0-9]{3})$/),

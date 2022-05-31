@@ -14,27 +14,32 @@ const login = async(req, res = response) => {
     });
 
     if (!user) {
-      res.status(400).json({
-        msg: 'The username or password is not correct.'
+      return res.status(400).json({
+        ok: false,
+        msg: 'The user name or password is not correct.'
       });
     }
     
     // Validate Password
-    const validatePassword = bcrypt.compareSync(password, password);
+    const validatePassword = bcrypt.compareSync(password, user.password);
 
     if(!validatePassword) {
       return res.status(400).json({
-        msg: 'The username or password is not correct.'
+        ok: false,
+        msg: 'The user name or password is not correct.'
       });
     }
 
     res.status(200).json({
-      name: user.name
+      ok: true,
+      name: user.name,
+      email: user.email
     });
 
   } catch (error) {
     console.log(error);
     res.status(500).json({
+      ok: false,
       msg: 'Please talk to the admin.'
     });
   }
@@ -42,16 +47,17 @@ const login = async(req, res = response) => {
 }
 
 const register = async(req, res = response) => {
-  const {name, email, password} = req.body;
+  const {name, email, password: noCryptPassword} = req.body;
 
   try {
 
-    const user = await User.findOne({
+    const hasEmail = await User.findOne({
       where: {email}
     });
 
-    if (user) {
+    if (hasEmail) {
       return res.status(400).json({
+        ok: false,
         msg: `There is already a user with the email: ${email}`
       });
     }
@@ -59,15 +65,20 @@ const register = async(req, res = response) => {
 
     // Encrypt password
     const salt = bcrypt.genSaltSync();
-    const cryptPassword = bcrypt.hashSync(password, salt);
+    const password = bcrypt.hashSync(noCryptPassword, salt);
 
-    user = await User.create({name, email, cryptPassword});
+    const user = await User.create({name, email, password});
   
-    res.status(202).json(user);
+    res.status(202).json({
+      ok: true,
+      name: user.name,
+      email: user.email
+    });
     
   } catch (error) {
     console.log(error);
     res.status(500).json({
+      ok: false,
       msg: 'Please talk to the admin.'
     });
   }
